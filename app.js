@@ -2,6 +2,7 @@ const inquirer = require('inquirer')
 const con = require("./db/con");
 const employees = require("./prompts/employees");
 const departments = require("./prompts/departments");
+const roles = require("./prompts/roles");
 
 const action = {
     name: 'action',
@@ -21,9 +22,10 @@ con.connect(async function(err) {
             departments(con);
             break;
         case "Roles":
+            roles(con);
             break;
         case "Employees":
-            await employees(con);
+            employees(con);
             break;
         }
 });
