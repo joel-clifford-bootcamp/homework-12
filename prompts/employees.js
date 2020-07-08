@@ -26,10 +26,10 @@ module.exports = (con) => {
                 db.viewEmployees(con);
                 break;
             case 1:
-                db.viewByManager(con);
+                db.viewByRole(con);
                 break;
             case 2:
-                db.viewByRole(con);
+                db.viewByManager(con);
                 break;
             case 3: 
                 db.addEmployee(con);
