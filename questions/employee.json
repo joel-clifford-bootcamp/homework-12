@@ -27,5 +27,17 @@
         "name": "manager",
         "message": "Who is the employee\"s Manager?",
         "type": "list"
-    }   
+    },  
+
+    "employeeToRemove": {
+        "name": "employee",
+        "message": "Which employee is getting the boot?",
+        "type": "list"
+    },
+
+    "selectAnEmployee": {
+        "name": "employee",
+        "message": "Select an employee",
+        "type": "list"
+    }
 }
