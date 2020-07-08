@@ -32,6 +32,9 @@ function validateSalary(input){
     if(value < 26880)
         return ("We comply with labour laws. Salary can't be below minimum wage.")
 
+    if(value > 300000)
+        return "Not in the budget. Maybe next year."
+
     return true;
 };
 
