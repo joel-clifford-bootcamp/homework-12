@@ -30,7 +30,7 @@ module.exports = (con) => {
                 db.removeDepartment(con);
                 break;
             case 3: 
-                db.ViewDepartmentBudgets(con);
+                db.viewDepartmentBudgets(con);
                 break;
         }
     });

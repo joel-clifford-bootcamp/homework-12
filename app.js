@@ -1,6 +1,7 @@
 const inquirer = require('inquirer')
 const con = require("./db/con");
 const employees = require("./prompts/employees");
+const departments = require("./prompts/departments");
 
 const action = {
     name: 'action',
@@ -12,16 +13,17 @@ const action = {
 con.connect(async function(err) {
     if (err) throw err;
 
-        const resp = await inquirer.prompt(action);
-        selectedAction = resp.action;
- 
-        switch(selectedAction){
-            case "Departments":
-                break;
-            case "Roles":
-                break;
-            case "Employees":
-                await employees(con);
-                break;
+    const resp = await inquirer.prompt(action);
+    selectedAction = resp.action;
+
+    switch(selectedAction){
+        case "Departments":
+            departments(con);
+            break;
+        case "Roles":
+            break;
+        case "Employees":
+            await employees(con);
+            break;
         }
-  });
+});
