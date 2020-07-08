@@ -1,94 +1,29 @@
 const inquirer = require('inquirer')
 const con = require("./con");
+const employees = require("./prompts/employees");
 
-
-const action = [{
+const action = {
     name: 'action',
-    message: 'What would you like to do?',
+    message: 'What would you like to manage',
     type: 'list',
-    choices: [
-        'View all employees',
-        'View all employees by Department',
-        'View all employees by Manager',
-        'Add employee',
-        'Remove employee',
-        'Update employee role',
-        'Update employee manager',
-        'Add a department',
-        'Add a role',
-        'Exit'
-    ]
-}];
-
-
-const employeeBasicInfo = [{
-    name: 'firstName',
-    message: 'What is the employee\'s first name?',
-    type: 'input'
-},
-{
-    name: 'lastName',
-    message: 'What is the employee\'s last name?',
-    type: 'input'
-},
-{    name: 'department',
-     message: 'What is the employee\'s department?',
-     type: 'list',
- }];
-
-const employeeRole = {
-    name: 'role',
-    message: 'What is the employee\'s role?',
-    type: 'list',
-};
-
-const employeeManager = {
-    name: "manager",
-    message: 'Who is the employee\'s Manager?',
-    type: "list"
+    choices: ['Departments', 'Roles', 'Employees', 'Nothing (Exit)']
 }
-
 
 con.connect(async function(err) {
     if (err) throw err;
 
-    let selectedAction;
-    
-    while(selectedAction != 'Exit' ){
-        
-        let resp = await inquirer.prompt(action);
+        const resp = await inquirer.prompt(action);
         selectedAction = resp.action;
-
-        switch(action[0].choices.indexOf(selectedAction)){
-            case 0:
-                viewEmployees()
-                break
-            case 1:
-                viewEmployeesByDepartment()
-                break
-            case 2:
-                viewEmployeesByManager()
-                break
-            case 3:
-                addEmployee()
-                break
-            case 4:
-                removeEmployee()
-                break
-            case 5:
-                updateEmployeeRole()
-                break
-            case 6:
-                updateEmployeeManger()
-                break
-            case 7:
-                addDepartment()
+ 
+        switch(selectedAction){
+            case "Departments":
                 break;
-            case 8:
-                addRole();
+            case "Roles":
+                break;
+            case "Employees":
+                await employees(con);
                 break;
         }
-    }
   });
 
 
@@ -132,33 +67,7 @@ function viewEmployeesByManager(){
     });
 }
 
-function viewEmployeesByDepartment(){
-    con
-    .query("SELECT * FROM department", (err, departments, fields) => {
 
-            const departmentNames = departments.map(d => d.name);
-
-            inquirer.prompt( {
-                name: 'department',
-                message: 'Select department:',
-                type: 'list',
-                choices: departmentNames,
-
-            }).then(resp => {
-                
-                const departmentId = departments[departmentNames.indexOf(resp.department)].id;
-                
-                con.query(`SELECT first_name, last_name \
-                           FROM employee \
-                           WHERE role_id IN ( \
-                                SELECT id FROM role WHERE department_id = ${departmentId})`, 
-                         (err, employees) => {
-
-                    console.table(employees);
-                });
-            });
-        });
-}
 
 /**
  * Add a new employee

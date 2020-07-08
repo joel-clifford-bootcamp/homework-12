@@ -1,0 +1,31 @@
+{
+    "employeeBasicInfo": [
+        {
+            "name": "firstName",
+            "message": "What is the employee\"s first name?",
+            "type": "input"
+        },
+        {
+            "name": "lastName",
+            "message": "What is the employee\"s last name?",
+            "type": "input"
+        },
+        {    
+            "name": "department",
+            "message": "What is the employee\"s department?",
+            "type": "list"
+        }
+    ],
+    
+    "employeeRole": {
+        "name": "role",
+        "message": "What is the employee\"s role?",
+        "type": "list"
+    },
+    
+    "employeeManager": {
+        "name": "manager",
+        "message": "Who is the employee\"s Manager?",
+        "type": "list"
+    }   
+}
