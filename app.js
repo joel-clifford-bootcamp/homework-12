@@ -1,5 +1,5 @@
 const inquirer = require('inquirer')
-const con = require("./con");
+const con = require("./db/con");
 const employees = require("./prompts/employees");
 
 const action = {
