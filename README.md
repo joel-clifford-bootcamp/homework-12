@@ -1,8 +1,26 @@
 # Unit 12 MySQL Homework: Employee Tracker
 
+## About
+
+Simple CLI interface connected to a mySQL database to allow a business to track and manage its employees
+
+# Usage
+
+  - In node, run app.js
+  - Select what entity type you would like to manage (Roles, Depatments or Employees)
+  - Select what you would like to do (Add, Remove, Update, or View Tables using predefined filters)
+
+# To Do
+  - Get loop working so that the app.js only needs to be run once in order to accomplish multiple tasks
+  - Update schema to allow managers/departments/etc to be removed even if they have child relations
+
+
+
+## Assignment Outline
+
 Developers are often tasked with creating interfaces that make it easy for non-developers to view and interact with information stored in databases. Often these interfaces are known as **C**ontent **M**anagement **S**ystems. In this homework assignment, your challenge is to architect and build a solution for managing a company's employees using node, inquirer, and MySQL.
 
-## Instructions
+### Instructions
 
 Design the following database schema containing three tables:
 
@@ -68,7 +86,7 @@ How do you deliver this? Here are some guidelines:
 
 ![Employee Tracker](Assets/employee-tracker.gif)
 
-### Hints
+#### Hints
 
 * You may wish to include a `seed.sql` file to pre-populate your database. This will make development of individual features much easier.
 
@@ -78,7 +96,7 @@ How do you deliver this? Here are some guidelines:
 
 * Check out [SQL Bolt](https://sqlbolt.com/) for some extra MySQL help.
 
-## Minimum Requirements
+### Minimum Requirements
 
 * Functional application.
 
@@ -92,7 +110,7 @@ How do you deliver this? Here are some guidelines:
 
   * Update employee roles
 
-## Bonus
+### Bonus
 
 * The command-line application should allow users to:
 
@@ -104,7 +122,7 @@ How do you deliver this? Here are some guidelines:
 
   * View the total utilized budget of a department -- ie the combined salaries of all employees in that department
 
-## Commit Early and Often
+### Commit Early and Often
 
 One of the most important skills to master as a web developer is version control. Building the habit of committing via Git is important for two reasons:
 
@@ -125,7 +143,7 @@ Follow these guidelines for committing:
 We would like you to have well over 200 commits by graduation, so commit early and often!
 
 
-## Submission on BCS
+### Submission on BCS
 
 You are required to submit the following:
 
