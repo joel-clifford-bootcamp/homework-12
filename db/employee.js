@@ -15,24 +15,42 @@ module.exports = {
         });
     },
 
+
+    viewByRole: con => {
+        con.query("SELECT * FROM role", async (err, roles) => {
+
+            const roleNames = roles.map(r => r.title);
+            rolePrompts.selectRole.choices = roleNames;
+
+            const roleName = await inquirer.prompt(rolePrompts.selectRole)
+            const roleId = roles.filter( r =>  r.title === roleName.role)[0].id;
+
+            con.query("SELECT * FROM employee WHERE role_id = ?", [roleId], (err, result) =>{
+                if(err)
+                    console.log("Unable to retrieve employee list");
+                else
+                    console.table(result);
+            })
+        })
+    },
+
     /**
      * Select a manager and view all of their underlings
      */
     viewByManager: con => {
-        con
-        .query("SELECT id, first_name, last_name FROM employee \
-                WHERE id IN ( \
-                    SELECT manager_id \
-                    FROM employee \
-                    GROUP BY manager_id \
-                    HAVING manager_id IS NOT NULL AND COUNT(id) > 0)",
+        con.query("SELECT id, first_name, last_name FROM employee \
+                    WHERE id IN ( \
+                        SELECT manager_id \
+                        FROM employee \
+                        GROUP BY manager_id \
+                        HAVING manager_id IS NOT NULL AND COUNT(id) > 0)",
             (err, managers, fields) => {
-    
+                
             if(managers.length === 0)
                 console.log('No managers have been entered');
             else{
                 const managerNames = managers.map(result => `${result.first_name} ${result.last_name}`);
-    
+
                 inquirer.prompt( {
                     name: 'manager',
                     message: 'Select manager:',
