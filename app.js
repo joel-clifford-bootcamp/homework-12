@@ -1,5 +1,6 @@
 const inquirer = require('inquirer')
-const mysql = require('mysql')
+const con = require("./con");
+
 
 const action = [{
     name: 'action',
@@ -12,30 +13,15 @@ const action = [{
         'Add employee',
         'Remove employee',
         'Update employee role',
-        'Update employee manager'
+        'Update employee manager',
+        'Add a department',
+        'Add a role',
+        'Exit'
     ]
 }];
 
-// Holds valid department names and ids
-let departments;
-// Holds valid role names and ids
-let roles;
 
-// Set roles choices based on department selected
-function getRolesChoices(answers){
-
-    const rolesRows = con.query("SELECT id, title FROM role WHERE department_id = ?", [departments[answers.department]])
-
-    if(rolesRows.length === 0) throw Error("No roles found in selected department");
-
-    console.log(rolesRows)
-
-    roles = Object.assign({}, ...rolesRows.map((row) => ({[row.title]: row.id})));
-
-    return Object.keys(roles)
-}
-
-const employee = [{
+const employeeBasicInfo = [{
     name: 'firstName',
     message: 'What is the employee\'s first name?',
     type: 'input'
@@ -45,33 +31,35 @@ const employee = [{
     message: 'What is the employee\'s last name?',
     type: 'input'
 },
-{
-    name: 'department',
-    message: 'What is the employee\'s department?',
-    type: 'list'
-},
-{
+{    name: 'department',
+     message: 'What is the employee\'s department?',
+     type: 'list',
+ }];
+
+const employeeRole = {
     name: 'role',
     message: 'What is the employee\'s role?',
     type: 'list',
-    choices:getRolesChoices
+};
+
+const employeeManager = {
+    name: "manager",
+    message: 'Who is the employee\'s Manager?',
+    type: "list"
 }
-]
 
-var con = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "bootcamp",
-    database:'employee_tracker'
-  });
-  
-  con.connect(function(err) {
+
+con.connect(async function(err) {
     if (err) throw err;
-    console.log("Connected!");
-    inquirer.prompt(action).then(resp => {
 
-        switch(action[0].choices.indexOf(resp.action)){
+    let selectedAction;
+    
+    while(selectedAction != 'Exit' ){
+        
+        let resp = await inquirer.prompt(action);
+        selectedAction = resp.action;
+
+        switch(action[0].choices.indexOf(selectedAction)){
             case 0:
                 viewEmployees()
                 break
@@ -93,8 +81,14 @@ var con = mysql.createConnection({
             case 6:
                 updateEmployeeManger()
                 break
+            case 7:
+                addDepartment()
+                break;
+            case 8:
+                addRole();
+                break;
         }
-    })
+    }
   });
 
 
@@ -106,35 +100,147 @@ function viewEmployees(){
 }
 
 function viewEmployeesByManager(){
+    con
+    .query("SELECT id, first_name, last_name FROM employee \
+            WHERE id IN ( \
+                SELECT manager_id \
+                FROM employee \
+                GROUP BY manager_id \
+                HAVING manager_id IS NOT NULL AND COUNT(id) > 0)",
+        (err, managers, fields) => {
 
+        if(managers.length === 0)
+            console.log('No managers have been entered');
+        else{
+            const managerNames = managers.map(result => `${result.first_name} ${result.last_name}`);
+
+            inquirer.prompt( {
+                name: 'manager',
+                message: 'Select manager:',
+                type: 'list',
+                choices: managerNames
+            }).then(resp => {
+                
+                const managerId = managers[managerNames.indexOf(resp.manager)].id;
+                
+                con.query(`SELECT first_name, last_name FROM employee WHERE manager_id = ${managerId}`, (err, employees) => {
+
+                    console.table(employees);
+                });
+            });
+        }
+    });
 }
 
 function viewEmployeesByDepartment(){
+    con
+    .query("SELECT * FROM department", (err, departments, fields) => {
 
+            const departmentNames = departments.map(d => d.name);
+
+            inquirer.prompt( {
+                name: 'department',
+                message: 'Select department:',
+                type: 'list',
+                choices: departmentNames,
+
+            }).then(resp => {
+                
+                const departmentId = departments[departmentNames.indexOf(resp.department)].id;
+                
+                con.query(`SELECT first_name, last_name \
+                           FROM employee \
+                           WHERE role_id IN ( \
+                                SELECT id FROM role WHERE department_id = ${departmentId})`, 
+                         (err, employees) => {
+
+                    console.table(employees);
+                });
+            });
+        });
 }
 
-function addEmployee(){
-    con.query("SELECT * FROM department", (err, results, fields) => {
-        if(err) throw err
+/**
+ * Add a new employee
+ */
+function addEmployee(id = null){
 
-        // Set choices for department
-        departments = Object.assign({}, ...results.map((row) => ({[row.name]: row.id})));
-        employee[2].choices = Object.keys(departments)
+    con.query("SELECT * FROM department", async (err, departments) => {
 
-        inquirer.prompt(employee).then(resp => {
-            const query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ?"
-            const values  = [[resp.firstName, resp.lastName, resp]]
-        })
-    })
+        employeeBasicInfo[2].choices = departments.map(d => d.name);
+
+        const { firstName, lastName, department } = await inquirer.prompt(employeeBasicInfo);
+
+        const departmentId = departments.filter(d => d.name == department)[0].id;
+
+        con.query(`SELECT * FROM role WHERE department_id = ${departmentId}`, async (err, roles) => {
+            
+            employeeRole.choices = roles.map(r => r.title);
+
+            const { role } = await inquirer.prompt(employeeRole);
+            
+            const roleId = roles.filter(d => d.title == role)[0].id;
+
+            con.query(`SELECT * FROM employee WHERE role_id IN (SELECT id FROM role WHERE department_id = ${departmentId})`, async (err, managers) => {
+
+                let manager;
+                let managerId;
+
+                if(managers.length > 0)
+                {
+                    const managersArray = managers.map(m => `${m.first_name} ${m.last_name}`);
+                    managersArray.push("None");
+
+                    employeeManager.choices = managersArray;
+
+                    manager = await inquirer.prompt(employeeManager);
+                    
+                    managerId = manager.manager == "None" ? null : managers[managersArray.indexOf(manager.manager)].id;
+                }
+
+                const sql = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ?"
+                const values  = [[firstName, lastName, roleId, managerId]]
+                
+                con.query(sql, [values], function (err, result) {
+                    if (err) throw err;
+                    console.log("Employee Added");
+                  });
+            });
+        });
+    });
 }
 
-function updateEmployee(con){
+/**
+ * Remove and employee
+ */
+function removeEmployee(){
+    con.query("SELECT * FROM employee", (err, employees) => {
+        
+        const employeeNames =  employees.map(e => `${e.first_name} ${e.last_name}`);
+        employeeNames.push("None");
 
+        if(employees.length > 0) {
+            inquirer.prompt({
+                name: "employee",
+                message: "Which employee is getting the boot?",
+                type: "list",
+                choices: employeeNames
+            }).then(resp => {
+
+                const employeeId = resp.employee == "None" ? null : employees[employeeNames.indexOf(resp.employee)].id;
+
+                if(resp.Name != "None"){
+                    con.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, result) => {
+                        if(err) throw err;
+
+                        console.log(`Bye ${resp.employee.split(' ')[0]} :(`)
+                    });
+                }
+            });
+        }
+    });
 }
 
-function removeEmployee(con){
-
-}
 
 function updateEmployeeRole(con){
 
