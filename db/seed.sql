@@ -13,7 +13,7 @@ VALUES
 	("Sales Lead",100000,4),
 	("Software Engineer",150000,1),
 	("Lead Engineer",120000,1),
-	("Accountant",125000,1),
+	("Accountant",125000,2),
 	("Lawyer",190000,3),
 	("Legal Team Lead",250000,3);
 
