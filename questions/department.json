@@ -1,0 +1,18 @@
+{
+    "remove": {
+        "name": "department",
+        "message": "Select a department to remove:",
+        "type": "list"
+    },
+
+    "layoff": {
+        "name": "confirm",
+        "type": "confirm"
+    }, 
+
+    "add": {
+            "name": "name",
+            "message": "Enter new department's name:",
+            "type": "input"            
+        }
+}
