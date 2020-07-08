@@ -1,7 +1,26 @@
 {
     "selectRole": {
         "name": "role",
-        "message": "Select a role",
+        "message": "Select a role:",
         "type": "list"
-    }
+    },
+
+    "department": {
+        "name": "department",
+        "message": "What is this Role's department",
+        "type": "list"
+    },
+
+    "add": [
+        {
+            "name": "title",
+            "message": "What is the role Title?",
+            "type": "input"
+        },
+        {
+            "name": "salary",
+            "message": "What is the role's starting salary?",
+            "type": "input"
+        }
+    ]
 }
