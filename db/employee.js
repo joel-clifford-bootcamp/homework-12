@@ -16,6 +16,43 @@ module.exports = {
     },
 
     /**
+     * Select a manager and view all of their underlings
+     */
+    viewByManager: con => {
+        con
+        .query("SELECT id, first_name, last_name FROM employee \
+                WHERE id IN ( \
+                    SELECT manager_id \
+                    FROM employee \
+                    GROUP BY manager_id \
+                    HAVING manager_id IS NOT NULL AND COUNT(id) > 0)",
+            (err, managers, fields) => {
+    
+            if(managers.length === 0)
+                console.log('No managers have been entered');
+            else{
+                const managerNames = managers.map(result => `${result.first_name} ${result.last_name}`);
+    
+                inquirer.prompt( {
+                    name: 'manager',
+                    message: 'Select manager:',
+                    type: 'list',
+                    choices: managerNames
+                }).then(resp => {
+                    
+                    const managerId = managers[managerNames.indexOf(resp.manager)].id;
+                    
+                    con.query(`SELECT first_name, last_name FROM employee WHERE manager_id = ${managerId}`, (err, employees) => {
+    
+                        console.table(employees);
+                    });
+                });
+            }
+        });
+    },
+
+
+    /**
      * Add a new emplyee
      * @param {object} con mysql connection 
      */
