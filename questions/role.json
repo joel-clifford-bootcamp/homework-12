@@ -1,0 +1,7 @@
+{
+    "selectRole": {
+        "name": "role",
+        "message": "Select a role",
+        "type": "list"
+    }
+}
