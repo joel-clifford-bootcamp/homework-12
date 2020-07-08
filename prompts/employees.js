@@ -10,8 +10,7 @@ const action = {
         'View all employees',
         'Add employee',
         'Remove employee',
-        'Update employee role',
-        'Update employee manager',
+        'Update employee role and/or Manager',
     ]
 };
 
@@ -23,6 +22,16 @@ module.exports = (con) => {
         {
             case 0:
                 db.viewEmployees(con);
+                break;
+            case 1: 
+                db.addEmployee(con);
+                break;
+            case 2:
+                db.removeEmployee(con);
+                break;
+            case 3:
+                db.updateEmployeeRoleAndManager(con);
+                break;
         }
     });
 }
